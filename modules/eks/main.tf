@@ -1,21 +1,26 @@
-module "eks" {
-  source          = "terraform-aws-modules/eks/aws"
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
-  subnets         = var.subnet_ids
-  vpc_id          = var.vpc_id
 
-  eks_managed_node_groups = {
-    default = {
-      desired_capacity = 2
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_types   = ["t3.medium"]
+resource "aws_eks_cluster" "main" {
+  name     = var.cluster_name
+  role_arn = var.cluster_role_arn
+  version  = var.kubernetes_version
+
+  vpc_config {
+    subnet_ids              = var.subnet_ids
+    endpoint_private_access = var.endpoint_private_access
+    endpoint_public_access  = var.endpoint_public_access
+    security_group_ids      = var.security_group_ids
+  }
+
+  enabled_cluster_log_types = var.enabled_cluster_log_types
+
+  tags = merge(
+    var.tags,
+    {
+      "Name" = var.cluster_name
     }
-  }
+  )
 
-  tags = {
-    Environment = "dev"
-    Terraform   = "true"
-  }
+  depends_on = [
+    var.cluster_dependencies
+  ]
 }

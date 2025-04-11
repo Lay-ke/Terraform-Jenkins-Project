@@ -74,3 +74,60 @@ resource "aws_autoscaling_group" "this" {
     propagate_at_launch = true
   }
 }
+
+module "iam" {
+  source = "./modules/iam"
+  
+  cluster_name             = var.cluster_name
+  enable_cluster_autoscaler = false
+}
+
+module "eks" {
+  source = "./modules/eks"
+  
+  cluster_name           = var.cluster_name
+  cluster_role_arn       = module.iam.eks_cluster_role_arn
+  kubernetes_version     = var.kubernetes_version
+  vpc_id                 = module.vpc.vpc_id
+  
+  # Reference existing subnets instead of creating new ones
+  subnet_ids             = module.subnets.private_subnet_ids
+  
+  # Pass existing security groups
+  security_group_ids     = [module.security_groups.web_sg_id] # List of security groups
+  
+  # Don't create a new security group in the EKS module
+  create_cluster_security_group = false
+  
+  tags                   = var.tags
+  
+  cluster_dependencies = [
+    module.iam.eks_cluster_role_arn
+  ]
+}
+
+
+module "node_groups" {
+  source = "./modules/node_groups"
+  
+  cluster_name    = module.eks.cluster_name
+  node_group_name = var.node_group_name
+  node_role_arn   = module.iam.eks_node_role_arn
+  
+  # Use existing private subnets
+  subnet_ids      = module.subnets.private_subnet_ids
+  
+  instance_types  = var.node_instance_types
+  desired_size    = var.node_desired_size
+  min_size        = var.node_min_size
+  max_size        = var.node_max_size
+  tags            = var.tags
+  
+  # You might want to add your security group here
+  source_security_group_ids = [module.security_groups.web_sg_id]
+  
+  node_group_dependencies = [
+    module.iam.eks_node_role_arn
+  ]
+}
+
