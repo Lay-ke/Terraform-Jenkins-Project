@@ -7,6 +7,7 @@ module "vpc" {
   source     = "./modules/vpc"
   cidr_block = "192.168.0.0/16"
   name       = "LAMP-VPC"
+  public_subnet_ids = module.subnets.public_subnet_ids
 }
 
 # Module for Subnets

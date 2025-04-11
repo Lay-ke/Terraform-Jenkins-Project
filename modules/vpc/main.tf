@@ -29,3 +29,9 @@ resource "aws_route" "internet_access" {
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.this.id
 }
+
+resource "aws_route_table_association" "public_subnet_association" {
+  count          = length(var.public_subnet_ids)
+  subnet_id      = var.public_subnet_ids[count.index]  # Use the passed-in subnet IDs directly
+  route_table_id = aws_route_table.public.id
+}
