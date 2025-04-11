@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-west-1"
 }
 
 # Module for VPC
@@ -15,14 +15,14 @@ module "subnets" {
   vpc_id = module.vpc.vpc_id
 
   public_subnets = [
-    { cidr = "192.168.16.0/24", az = "us-east-1a", name = "PublicSubnet1" },
-    { cidr = "192.168.32.0/20", az = "us-east-1b", name = "PublicSubnet2" },
-    { cidr = "192.168.48.0/20", az = "us-east-1c", name = "PublicSubnet3" }
+    { cidr = "192.168.16.0/24", az = "eu-west-1a", name = "PublicSubnet1" },
+    { cidr = "192.168.32.0/20", az = "eu-west-1b", name = "PublicSubnet2" },
+    { cidr = "192.168.48.0/20", az = "eu-west-1c", name = "PublicSubnet3" }
   ]
 
   private_subnets = [
-    { cidr = "192.168.64.0/20", az = "us-east-1a", name = "PrivateSubnet1" },
-    { cidr = "192.168.80.0/20", az = "us-east-1b", name = "PrivateSubnet2" }
+    { cidr = "192.168.64.0/20", az = "eu-west-1a", name = "PrivateSubnet1" },
+    { cidr = "192.168.80.0/20", az = "eu-west-1b", name = "PrivateSubnet2" }
   ]
 }
 
@@ -46,7 +46,8 @@ module "ec2" {
   source                    = "./modules/ec2"
   instance_type             = "t2.micro"
   sg_id                     = module.security_groups.web_sg_id
-  iam_instance_profile_name = "EC2InstanceProfile"
+  iam_instance_profile_name = "instance-profile"
+  ami_id = "ami-0df368112825f8d8f"
 }
 
 # Auto Scaling Group for EC2 instances using Launch Template
@@ -54,7 +55,7 @@ resource "aws_autoscaling_group" "this" {
   desired_capacity    = 2
   max_size            = 5
   min_size            = 1
-  vpc_zone_identifier = module.subnets.private_subnet_ids
+  vpc_zone_identifier = module.subnets.public_subnet_ids
   launch_template {
     id      = module.ec2.launch_template_id
     version = "$Latest"
@@ -68,7 +69,7 @@ resource "aws_autoscaling_group" "this" {
 
   tag {
     key                 = "Name"
-    value               = "LampAutoScalingGroup"
+    value               = "WebServer"
     propagate_at_launch = true
   }
 }
