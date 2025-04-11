@@ -59,7 +59,7 @@ resource "aws_autoscaling_group" "this" {
     id      = module.ec2.launch_template_id
     version = "$Latest"
   }
-  target_group_arns = [module.alb.target_group_arn]
+  target_group_arns = [module.alb.target_group_arn]  # To access the tg_arn I had to output it in the alb module
 
   health_check_type         = "EC2"
   health_check_grace_period = 300
