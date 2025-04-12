@@ -24,10 +24,10 @@ resource "aws_security_group" "web" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port                = 80
-    to_port                  = 80
-    protocol                 = "tcp"
-    security_groups          = [aws_security_group.lb.id]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    security_groups = [aws_security_group.lb.id]
   }
 
   egress {
@@ -39,9 +39,9 @@ resource "aws_security_group" "web" {
 }
 
 resource "aws_security_group" "worker_node" {
-  name = "worker-node-sg"
+  name        = "worker-node-sg"
   description = "Allow traffic from Control Plane"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   // Allow inbound communication from other worker nodes within the same VPC
   ingress {
@@ -61,9 +61,9 @@ resource "aws_security_group" "worker_node" {
 
   // Allow outbound communication to the internet
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -6,5 +6,5 @@ variable "cluster_name" {
 variable "enable_cluster_autoscaler" {
   description = "Whether to enable cluster autoscaler IAM policy"
   type        = bool
-  default = false    
+  default     = false
 }
