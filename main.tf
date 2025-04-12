@@ -91,10 +91,10 @@ module "eks" {
   vpc_id                 = module.vpc.vpc_id
   
   # Reference existing subnets instead of creating new ones
-  subnet_ids             = module.subnets.private_subnet_ids
+  subnet_ids             = module.subnets.public_subnet_ids
   
-  # Pass existing security groups
-  security_group_ids     = [module.security_groups.web_sg_id] # List of security groups
+  # # Pass existing security groups
+  # security_group_ids     = [module.security_groups.web_sg_id] # List of security groups
   
   # Don't create a new security group in the EKS module
   create_cluster_security_group = false
@@ -115,7 +115,7 @@ module "node_groups" {
   node_role_arn   = module.iam.eks_node_role_arn
   
   # Use existing private subnets
-  subnet_ids      = module.subnets.private_subnet_ids
+  subnet_ids      = module.subnets.public_subnet_ids
   
   instance_types  = var.node_instance_types
   desired_size    = var.node_desired_size
@@ -124,7 +124,7 @@ module "node_groups" {
   tags            = var.tags
   
   # You might want to add your security group here
-  source_security_group_ids = [module.security_groups.web_sg_id]
+  source_security_group_ids = [module.security_groups.worker_node_sg_id]
   
   node_group_dependencies = [
     module.iam.eks_node_role_arn

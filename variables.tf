@@ -45,7 +45,7 @@ variable "public_subnet_cidrs" {
 variable "kubernetes_version" {
   description = "Kubernetes version to use for the EKS cluster"
   type        = string
-  default     = "1.27"
+  default     = "1.32"
 }
 
 # Node Group Variables
