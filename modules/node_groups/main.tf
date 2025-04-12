@@ -16,10 +16,10 @@ resource "aws_eks_node_group" "main" {
   instance_types  = var.instance_types
   release_version = var.ami_release_version
 
-  remote_access {
-    ec2_ssh_key               = var.ec2_ssh_key
-    source_security_group_ids = var.source_security_group_ids
-  }
+  # remote_access {
+  #   ec2_ssh_key               = var.ec2_ssh_key
+  #   source_security_group_ids = var.source_security_group_ids
+  # }
 
   labels = var.kubernetes_labels
 

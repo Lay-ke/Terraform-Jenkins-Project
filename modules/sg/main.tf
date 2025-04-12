@@ -37,3 +37,33 @@ resource "aws_security_group" "web" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "worker_node" {
+  name = "worker-node-sg"
+  description = "Allow traffic from Control Plane"
+  vpc_id = var.vpc_id
+
+  // Allow inbound communication from other worker nodes within the same VPC
+  ingress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] # Adjust this to your VPC CIDR range
+  }
+
+  // Allow inbound communication on port 443 for Kubernetes API server
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Change this to restrict access if necessary
+  }
+
+  // Allow outbound communication to the internet
+  egress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
