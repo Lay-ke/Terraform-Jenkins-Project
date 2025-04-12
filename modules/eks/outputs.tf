@@ -19,8 +19,8 @@ output "cluster_certificate_authority_data" {
 }
 
 output "cluster_security_group_id" {
-  description = "Security group ID of the EKS cluster" 
-  value       = var.create_cluster_security_group == false ? var.security_group_ids :  null
+  description = "Security group ID of the EKS cluster"
+  value       = var.create_cluster_security_group == false ? var.security_group_ids : null
   #value       = var.create_cluster_security_group ? aws_security_group.cluster[0].id : null
 }
 

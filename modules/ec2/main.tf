@@ -1,5 +1,5 @@
 resource "aws_iam_role" "instance_role" {
-  name = "instance-role"
+  name               = "instance-role"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role.json
 }
 
@@ -37,7 +37,7 @@ resource "aws_launch_template" "this" {
     name = var.iam_instance_profile_name
   }
 
-  
+
   user_data = base64encode(file(join("/", [path.cwd, "scripts", "user-data.sh"])))
 
 

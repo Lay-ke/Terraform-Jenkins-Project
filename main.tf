@@ -4,9 +4,9 @@ provider "aws" {
 
 # Module for VPC
 module "vpc" {
-  source     = "./modules/vpc"
-  cidr_block = "192.168.0.0/16"
-  name       = "LAMP-VPC"
+  source            = "./modules/vpc"
+  cidr_block        = "192.168.0.0/16"
+  name              = "LAMP-VPC"
   public_subnet_ids = module.subnets.public_subnet_ids
 }
 
@@ -48,7 +48,7 @@ module "ec2" {
   instance_type             = "t2.micro"
   sg_id                     = module.security_groups.web_sg_id
   iam_instance_profile_name = "instance-profile"
-  ami_id = "ami-0df368112825f8d8f"
+  ami_id                    = "ami-0df368112825f8d8f"
 }
 
 # Auto Scaling Group for EC2 instances using Launch Template
@@ -61,7 +61,7 @@ resource "aws_autoscaling_group" "this" {
     id      = module.ec2.launch_template_id
     version = "$Latest"
   }
-  target_group_arns = [module.alb.target_group_arn]  # To access the tg_arn I had to output it in the alb module
+  target_group_arns = [module.alb.target_group_arn] # To access the tg_arn I had to output it in the alb module
 
   health_check_type         = "EC2"
   health_check_grace_period = 300
@@ -77,30 +77,30 @@ resource "aws_autoscaling_group" "this" {
 
 module "iam" {
   source = "./modules/iam"
-  
-  cluster_name             = var.cluster_name
+
+  cluster_name              = var.cluster_name
   enable_cluster_autoscaler = false
 }
 
 module "eks" {
   source = "./modules/eks"
-  
-  cluster_name           = var.cluster_name
-  cluster_role_arn       = module.iam.eks_cluster_role_arn
-  kubernetes_version     = var.kubernetes_version
-  vpc_id                 = module.vpc.vpc_id
-  
+
+  cluster_name       = var.cluster_name
+  cluster_role_arn   = module.iam.eks_cluster_role_arn
+  kubernetes_version = var.kubernetes_version
+  vpc_id             = module.vpc.vpc_id
+
   # Reference existing subnets instead of creating new ones
-  subnet_ids             = module.subnets.public_subnet_ids
-  
+  subnet_ids = module.subnets.public_subnet_ids
+
   # # Pass existing security groups
   # security_group_ids     = [module.security_groups.web_sg_id] # List of security groups
-  
+
   # Don't create a new security group in the EKS module
   create_cluster_security_group = false
-  
-  tags                   = var.tags
-  
+
+  tags = var.tags
+
   cluster_dependencies = [
     module.iam.eks_cluster_role_arn
   ]
@@ -109,23 +109,23 @@ module "eks" {
 
 module "node_groups" {
   source = "./modules/node_groups"
-  
+
   cluster_name    = module.eks.cluster_name
   node_group_name = var.node_group_name
   node_role_arn   = module.iam.eks_node_role_arn
-  
+
   # Use existing private subnets
-  subnet_ids      = module.subnets.public_subnet_ids
-  
-  instance_types  = var.node_instance_types
-  desired_size    = var.node_desired_size
-  min_size        = var.node_min_size
-  max_size        = var.node_max_size
-  tags            = var.tags
-  
+  subnet_ids = module.subnets.public_subnet_ids
+
+  instance_types = var.node_instance_types
+  desired_size   = var.node_desired_size
+  min_size       = var.node_min_size
+  max_size       = var.node_max_size
+  tags           = var.tags
+
   # You might want to add your security group here
   source_security_group_ids = [module.security_groups.worker_node_sg_id]
-  
+
   node_group_dependencies = [
     module.iam.eks_node_role_arn
   ]
