@@ -38,7 +38,8 @@ resource "aws_launch_template" "this" {
   }
 
   
-  user_data = base64encode(file("/home/yaw/Documents/LABS_HUB/EKS-Project/scripts/user-data.sh"))
+  user_data = base64encode(file(join("/", [path.cwd, "scripts", "user-data.sh"])))
+
 
   lifecycle {
     create_before_destroy = true
