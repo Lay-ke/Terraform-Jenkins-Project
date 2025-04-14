@@ -26,7 +26,7 @@ In the `aws-auth` ConfigMap, under the `mapRoles` section, add your IAM role ARN
 apiVersion: v1
 data:
     mapRoles: |
-        - rolearn: arn:aws:iam::711387121692:role/MyEksNodeGroupRole
+        - rolearn: arn:aws:iam::<account-id>:role/MyEksNodeGroupRole
             username: my-eks-node-group
             groups:
                 - system:masters
@@ -45,7 +45,7 @@ If you want to add a specific IAM user, use the `mapUsers` section:
 apiVersion: v1
 data:
     mapUsers: |
-        - userarn: arn:aws:iam::711387121692:user/my-eks-user
+        - userarn: arn:aws:iam::<>account-id:user/my-eks-user
             username: my-eks-user
             groups:
                 - system:masters
